@@ -1,0 +1,11 @@
+{
+    "name": "mota/campanhalw2019",
+    "require": {
+        "phpunit/phpunit": "^8.1",
+        "php": "^7.2"
+    },
+    "authors": [{
+        "name": "Anderson Mota",
+        "email": "anderson.mota12@gmail.com"
+    }]
+}

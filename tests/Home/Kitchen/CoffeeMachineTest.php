@@ -27,7 +27,8 @@ class CoffeeMachineTest extends TestCase
 
     public function testMakeCoffee() : void
     {
-        $level = 'medium';
+        $level = CoffeeMachine::LEVEL_LIGHT;
+
         $this->coffeePreferences = $this->mockCoffeePreferences(['getLevel']);
         $this->coffeeMachine = $this->mockCoffeeMachine(['start', 'setLevel', 'grindCoffeeBeans', 'addBoilingWater']);
 
@@ -53,6 +54,8 @@ class CoffeeMachineTest extends TestCase
             ->willReturn($this->coffeeMachine);
 
         $this->coffeeMachine->makeCoffee();
+
+        $this->assertAttributeSame($level, 'level', $this->coffeeMachine);
     }
 
     private function mockCoffeeMachine(array $methods)

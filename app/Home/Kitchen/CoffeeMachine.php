@@ -35,15 +35,15 @@ class CoffeeMachine extends HomeAppliances
         try {
             $this->start()
                 ->setLevel($this->level);
+
+            $this->grindCoffeeBeans()
+                ->addBoilingWater();
         } catch (\Exception $exception) {
             $this->turnOnTheRedLight()
                 ->alertWarning('Internal error, retry please.');
 
             Logger::write($exception->getMessage());
         }
-
-        $this->grindCoffeeBeans()
-            ->addBoilingWater();
     }
 
     public function setLevel(int $level) : void

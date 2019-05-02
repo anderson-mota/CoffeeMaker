@@ -5,6 +5,8 @@ namespace Tests\Home\Kitchen;
 use PHPUnit\Framework\TestCase;
 use App\Home\Kitchen\CoffeeMachine;
 use App\Home\Kitchen\CoffeePreferences;
+use App\Home\Kitchen\CoffeeBeans;
+use App\Home\Kitchen\CoffeeFilter;
 
 class CoffeeMachineTest extends TestCase
 {
@@ -14,15 +16,20 @@ class CoffeeMachineTest extends TestCase
     /** @var CoffeePreferences */
     private $coffeePreferences;
 
+    /** @var CoffeeFilter */
+    private $filter;
+
     public function setUp() : void
     {
-        $this->coffeePreferences = new CoffeePreferences();
-        $this->coffeeMachine = new CoffeeMachine($this->coffeePreferences);
+        $this->coffeePreferences = new CoffeePreferences;
+        $this->filter = new CoffeeFilter;
+        $this->coffeeMachine = new CoffeeMachine($this->coffeePreferences, $this->filter);
     }
 
     public function testConstruct() : void
     {
         $this->assertAttributeInstanceOf(CoffeePreferences::class, 'coffeePreferences', $this->coffeeMachine);
+        $this->assertAttributeInstanceOf(CoffeeFilter::class, 'filter', $this->coffeeMachine);
     }
 
     public function testMakeCoffee() : void
@@ -53,22 +60,56 @@ class CoffeeMachineTest extends TestCase
         $this->assertAttributeSame($intensity, 'intensity', $this->coffeeMachine);
     }
 
-    public function xtestGrindCoffeeBeans()
+    public function testGrindCoffeeBeans()
     {
-        $this->coffeeMachine->grindCoffeeBeans();
+        $intensity = CoffeeMachine::INTENSITY_LIGHT;
+
+        $this->filter = $this->mockFilter(['dump']);
+        $coffeeBeans = $this->mockCoffeeBeans(['takeBeansByIntensity']);
+        $coffeeBeans->expects($this->once())
+            ->method('takeBeansByIntensity')
+            ->with($intensity)
+            ->willReturn($coffeeBeans);
+
+        $coffeeGrinder->expects($this->once())
+            ->method('grind')
+            ->with($coffeeBeans)
+            ->willReturn($groundCoffee);
+
+        $this->filter->expects($this->once())
+            ->method('dump')
+            ->with($groundCoffee);
+
+        $coffeeMachine = $this->coffeeMachine->grindCoffeeBeans($coffeeBeans);
+
+        $this->assertInstanceOf(CoffeeMachine::class, $coffeeMachine);
     }
 
     private function mockCoffeeMachine(array $methods)
     {
         return $this->getMockBuilder(CoffeeMachine::class)
             ->setMethods($methods)
-            ->setConstructorArgs([$this->coffeePreferences])
+            ->setConstructorArgs([$this->coffeePreferences, $this->filter])
             ->getMock();
     }
 
     private function mockCoffeePreferences(array $methods)
     {
         return $this->getMockBuilder(CoffeePreferences::class)
+            ->setMethods($methods)
+            ->getMock();
+    }
+
+    private function mockCoffeeBeans(array $methods)
+    {
+        return $this->getMockBuilder(CoffeeBeans::class)
+            ->setMethods($methods)
+            ->getMock();
+    }
+
+    private function mockFilter(array $methods)
+    {
+        return $this->getMockBuilder(CoffeeFilter::class)
             ->setMethods($methods)
             ->getMock();
     }

@@ -7,6 +7,8 @@ use App\Home\HomeAppliances;
 
 class CoffeeMachine extends HomeAppliances
 {
+    use WaterHeater;
+
     const INTENSITY_LIGHT = 1;
     const INTENSITY_MEDIUM = 2;
     const INTENSITY_DARK = 3;
@@ -73,5 +75,7 @@ class CoffeeMachine extends HomeAppliances
 
     public function addBoilingWater()
     {
+        $hotWater = $this->heatTheWater($this->intensity);
+        $this->filter->dump($hotWater);
     }
 }

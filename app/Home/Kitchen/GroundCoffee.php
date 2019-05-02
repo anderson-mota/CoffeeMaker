@@ -2,6 +2,6 @@
 
 namespace App\Home\Kitchen;
 
-class GroundCoffee
+class GroundCoffee implements Ingredient
 {
 }

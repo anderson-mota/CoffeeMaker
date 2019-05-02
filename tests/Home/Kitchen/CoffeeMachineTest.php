@@ -9,6 +9,7 @@ use App\Home\Kitchen\CoffeeBeans;
 use App\Home\Kitchen\CoffeeFilter;
 use App\Home\Kitchen\GroundCoffee;
 use App\Home\Kitchen\CoffeeGrinder;
+use App\Home\Kitchen\Ingredient;
 
 class CoffeeMachineTest extends TestCase
 {
@@ -90,6 +91,26 @@ class CoffeeMachineTest extends TestCase
         $coffeeMachine = $this->coffeeMachine->grindCoffeeBeans($coffeeBeans, $coffeeGrinder);
 
         $this->assertInstanceOf(CoffeeMachine::class, $coffeeMachine);
+    }
+
+    public function testAddBoilingWater()
+    {
+        $intensity = CoffeeMachine::INTENSITY_LIGHT;
+        $hotWater = $this->createMock(Ingredient::class);
+        $this->filter = $this->mockFilter(['dump']);
+        $this->coffeeMachine = $this->mockCoffeeMachine(['heatTheWater']);
+
+        $this->coffeeMachine->expects($this->once())
+            ->method('heatTheWater')
+            ->with($intensity)
+            ->willReturn($hotWater);
+
+        $this->filter->expects($this->once())
+            ->method('dump')
+            ->with($hotWater);
+
+        $this->coffeeMachine->setIntensity($intensity);
+        $this->coffeeMachine->addBoilingWater();
     }
 
     private function mockCoffeeMachine(array $methods)

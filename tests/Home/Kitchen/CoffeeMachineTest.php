@@ -27,22 +27,17 @@ class CoffeeMachineTest extends TestCase
 
     public function testMakeCoffee() : void
     {
-        $level = CoffeeMachine::LEVEL_LIGHT;
+        $intensity = CoffeeMachine::INTENSITY_LIGHT;
 
-        $this->coffeePreferences = $this->mockCoffeePreferences(['getLevel']);
-        $this->coffeeMachine = $this->mockCoffeeMachine(['start', 'setLevel', 'grindCoffeeBeans', 'addBoilingWater']);
+        $this->coffeePreferences = $this->mockCoffeePreferences(['getIntensity']);
+        $this->coffeeMachine = $this->mockCoffeeMachine(['start', 'grindCoffeeBeans', 'addBoilingWater']);
 
         $this->coffeePreferences->expects($this->once())
-            ->method('getLevel')
-            ->willReturn($level);
+            ->method('getIntensity')
+            ->willReturn($intensity);
 
         $this->coffeeMachine->expects($this->once())
             ->method('start')
-            ->willReturn($this->coffeeMachine);
-
-        $this->coffeeMachine->expects($this->once())
-            ->method('setLevel')
-            ->with($level)
             ->willReturn($this->coffeeMachine);
 
         $this->coffeeMachine->expects($this->once())
@@ -55,7 +50,12 @@ class CoffeeMachineTest extends TestCase
 
         $this->coffeeMachine->makeCoffee();
 
-        $this->assertAttributeSame($level, 'level', $this->coffeeMachine);
+        $this->assertAttributeSame($intensity, 'intensity', $this->coffeeMachine);
+    }
+
+    public function xtestGrindCoffeeBeans()
+    {
+        $this->coffeeMachine->grindCoffeeBeans();
     }
 
     private function mockCoffeeMachine(array $methods)

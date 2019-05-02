@@ -8,20 +8,20 @@ use App\Home\Kitchen\CoffeePreferences;
 
 class CoffeeMachine extends HomeAppliances
 {
-    const LEVEL_LIGHT = 1;
-    const LEVEL_MEDIUM = 2;
-    const LEVEL_DARK = 3;
-    const ALLOW_LEVELS = [
-        self::LEVEL_LIGHT,
-        self::LEVEL_MEDIUM,
-        self::LEVEL_DARK,
+    const INTENSITY_LIGHT = 1;
+    const INTENSITY_MEDIUM = 2;
+    const INTENSITY_DARK = 3;
+    const ALLOW_INTENSITIES = [
+        self::INTENSITY_LIGHT,
+        self::INTENSITY_MEDIUM,
+        self::INTENSITY_DARK,
     ];
 
     /** @var CoffeePreferences */
     protected $coffeePreferences;
 
     /** @var string */
-    protected $level;
+    protected $intensity;
 
     public function __construct(CoffeePreferences $coffeePreferences)
     {
@@ -30,13 +30,12 @@ class CoffeeMachine extends HomeAppliances
 
     public function makeCoffee() : void
     {
-        $this->level = $this->coffeePreferences->getLevel();
+        $this->intensity = $this->coffeePreferences->getIntensity();
 
         try {
             $this->start()
-                ->setLevel($this->level);
-
-            $this->grindCoffeeBeans()
+                ->setIntensity($this->intensity)
+                ->grindCoffeeBeans()
                 ->addBoilingWater();
         } catch (\Exception $exception) {
             $this->turnOnTheRedLight()
@@ -46,13 +45,15 @@ class CoffeeMachine extends HomeAppliances
         }
     }
 
-    public function setLevel(int $level) : void
+    public function setIntensity(int $intensity) : CoffeeMachine
     {
-        if (in_array($level, self::ALLOW_LEVELS)) {
+        if (!in_array($intensity, self::ALLOW_INTENSITIES)) {
             throw new \Exception('Level not allow', 1);
         }
 
-        $this->level = $level;
+        $this->intensity = $intensity;
+
+        return $this;
     }
 
     public function grindCoffeeBeans()

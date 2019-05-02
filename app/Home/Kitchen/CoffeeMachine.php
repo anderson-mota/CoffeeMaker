@@ -4,7 +4,6 @@ namespace App\Home\Kitchen;
 
 use App\Logger;
 use App\Home\HomeAppliances;
-use App\Home\Kitchen\CoffeePreferences;
 
 class CoffeeMachine extends HomeAppliances
 {
@@ -23,19 +22,26 @@ class CoffeeMachine extends HomeAppliances
     /** @var string */
     protected $intensity;
 
-    public function __construct(CoffeePreferences $coffeePreferences)
+    /** @var CoffeeFilter */
+    protected $filter;
+
+    public function __construct(CoffeePreferences $coffeePreferences, CoffeeFilter $coffeeFilter)
     {
         $this->coffeePreferences = $coffeePreferences;
+        $this->filter = $coffeeFilter;
     }
 
     public function makeCoffee() : void
     {
         $this->intensity = $this->coffeePreferences->getIntensity();
 
+        $coffeeBeans = new CoffeeBeans;
+        $coffeeGrinder = new CoffeeGrinder;
+
         try {
             $this->start()
                 ->setIntensity($this->intensity)
-                ->grindCoffeeBeans()
+                ->grindCoffeeBeans($coffeeBeans, $coffeeGrinder)
                 ->addBoilingWater();
         } catch (\Exception $exception) {
             $this->turnOnTheRedLight()
@@ -56,8 +62,13 @@ class CoffeeMachine extends HomeAppliances
         return $this;
     }
 
-    public function grindCoffeeBeans()
+    public function grindCoffeeBeans(CoffeeBeans $coffeeBeans, CoffeeGrinder $coffeeGrinder)
     {
+        $coffeeBeans = $coffeeBeans->takeBeansByIntensity($this->intensity);
+        $groundCoffee = $coffeeGrinder->grind($coffeeBeans);
+        $this->filter->dump($groundCoffee);
+
+        return $this;
     }
 
     public function addBoilingWater()

@@ -7,6 +7,8 @@ use App\Home\Kitchen\CoffeeMachine;
 use App\Home\Kitchen\CoffeePreferences;
 use App\Home\Kitchen\CoffeeBeans;
 use App\Home\Kitchen\CoffeeFilter;
+use App\Home\Kitchen\GroundCoffee;
+use App\Home\Kitchen\CoffeeGrinder;
 
 class CoffeeMachineTest extends TestCase
 {
@@ -49,6 +51,7 @@ class CoffeeMachineTest extends TestCase
 
         $this->coffeeMachine->expects($this->once())
             ->method('grindCoffeeBeans')
+            ->with($this->isInstanceOf(CoffeeBeans::class), $this->isInstanceOf(CoffeeGrinder::class))
             ->willReturn($this->coffeeMachine);
 
         $this->coffeeMachine->expects($this->once())
@@ -63,8 +66,10 @@ class CoffeeMachineTest extends TestCase
     public function testGrindCoffeeBeans()
     {
         $intensity = CoffeeMachine::INTENSITY_LIGHT;
+        $groundCoffee = $this->createMock(GroundCoffee::class);
 
         $this->filter = $this->mockFilter(['dump']);
+        $coffeeGrinder = $this->mockCoffeeGrinder(['grind']);
         $coffeeBeans = $this->mockCoffeeBeans(['takeBeansByIntensity']);
         $coffeeBeans->expects($this->once())
             ->method('takeBeansByIntensity')
@@ -80,7 +85,9 @@ class CoffeeMachineTest extends TestCase
             ->method('dump')
             ->with($groundCoffee);
 
-        $coffeeMachine = $this->coffeeMachine->grindCoffeeBeans($coffeeBeans);
+        $this->coffeeMachine = new CoffeeMachine($this->coffeePreferences, $this->filter);
+        $this->coffeeMachine->setIntensity($intensity);
+        $coffeeMachine = $this->coffeeMachine->grindCoffeeBeans($coffeeBeans, $coffeeGrinder);
 
         $this->assertInstanceOf(CoffeeMachine::class, $coffeeMachine);
     }
@@ -110,6 +117,13 @@ class CoffeeMachineTest extends TestCase
     private function mockFilter(array $methods)
     {
         return $this->getMockBuilder(CoffeeFilter::class)
+            ->setMethods($methods)
+            ->getMock();
+    }
+
+    private function mockCoffeeGrinder(array $methods)
+    {
+        return $this->getMockBuilder(CoffeeGrinder::class)
             ->setMethods($methods)
             ->getMock();
     }

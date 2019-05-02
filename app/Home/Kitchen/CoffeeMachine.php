@@ -53,7 +53,7 @@ class CoffeeMachine extends HomeAppliances
         }
     }
 
-    public function setIntensity(int $intensity) : CoffeeMachine
+    public function setIntensity(array $intensity) : CoffeeMachine
     {
         if (!in_array($intensity, self::ALLOW_INTENSITIES)) {
             throw new \Exception('Level not allow', 1);
@@ -64,7 +64,7 @@ class CoffeeMachine extends HomeAppliances
         return $this;
     }
 
-    public function grindCoffeeBeans(CoffeeBeans $coffeeBeans, CoffeeGrinder $coffeeGrinder)
+    public function grindCoffeeBeans(CoffeeBeans $coffeeBeans, CoffeeGrinder $coffeeGrinder) : CoffeeMachine
     {
         $coffeeBeans = $coffeeBeans->takeBeansByIntensity($this->intensity);
         $groundCoffee = $coffeeGrinder->grind($coffeeBeans);

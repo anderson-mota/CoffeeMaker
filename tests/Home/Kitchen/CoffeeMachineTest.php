@@ -22,46 +22,17 @@ class CoffeeMachineTest extends TestCase
     /** @var CoffeeFilter */
     private $filter;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->coffeePreferences = new CoffeePreferences;
         $this->filter = new CoffeeFilter;
         $this->coffeeMachine = new CoffeeMachine($this->coffeePreferences, $this->filter);
     }
 
-    public function testConstruct() : void
+    public function testConstruct(): void
     {
         $this->assertAttributeInstanceOf(CoffeePreferences::class, 'coffeePreferences', $this->coffeeMachine);
         $this->assertAttributeInstanceOf(CoffeeFilter::class, 'filter', $this->coffeeMachine);
-    }
-
-    public function testMakeCoffee() : void
-    {
-        $intensity = CoffeeMachine::INTENSITY_LIGHT;
-
-        $this->coffeePreferences = $this->mockCoffeePreferences(['getIntensity']);
-        $this->coffeeMachine = $this->mockCoffeeMachine(['start', 'grindCoffeeBeans', 'addBoilingWater']);
-
-        $this->coffeePreferences->expects($this->once())
-            ->method('getIntensity')
-            ->willReturn($intensity);
-
-        $this->coffeeMachine->expects($this->once())
-            ->method('start')
-            ->willReturn($this->coffeeMachine);
-
-        $this->coffeeMachine->expects($this->once())
-            ->method('grindCoffeeBeans')
-            ->with($this->isInstanceOf(CoffeeBeans::class), $this->isInstanceOf(CoffeeGrinder::class))
-            ->willReturn($this->coffeeMachine);
-
-        $this->coffeeMachine->expects($this->once())
-            ->method('addBoilingWater')
-            ->willReturn($this->coffeeMachine);
-
-        $this->coffeeMachine->makeCoffee();
-
-        $this->assertAttributeSame($intensity, 'intensity', $this->coffeeMachine);
     }
 
     public function testGrindCoffeeBeans()
